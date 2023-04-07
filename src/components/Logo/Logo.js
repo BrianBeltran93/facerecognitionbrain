@@ -11,6 +11,8 @@ const Logo = () => {
                     <img style={{paddingTop: '25px'}} src={brain} alt="logo"/>
                 </div>
             </Tilt>
+            <a className="black f6" href='https://icons8.com/icon/2070/brain' 
+            target="_blank" rel="noreferrer">img origin</a>
         </div>
     )
 }
