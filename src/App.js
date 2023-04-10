@@ -99,29 +99,28 @@ class App extends Component {
     this.setState({input: event.target.value});
   }
 
-  onButtonSubmit = () => {
+  onPictureSubmit = () => {
     this.setState({imageUrl: this.state.input});
 
     fetch("https://api.clarifai.com/v2/models/face-detection/outputs", setupClarifaiRequestOptions(this.state.input))
     .then(response => response.json())
     .then(response => {
-        console.log('hi', response.outputs[0].data.regions[0].region_info.bounding_box)
         this.displayFaceBox(this.calculateFaceLocation(response))
-        .catch(err => console.log(err));
-        // if (response) {
-        //     fetch('http://localhost:3000/image', {
-        //         method: 'put',
-        //         headers: {'Content-Type': 'application/json'},
-        //         body: JSON.stringify({
-        //             id: this.state.user.id
-        //         })
-        //     })
-        //     .then(response => response.json())
-        //     .then(count => {
-        //         this.setState(Object.assign(this.state.user, { entries: count}))
-        //     })
-        // }
+        if (response) {
+            fetch('http://localhost:3001/image', {
+                method: 'put',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    id: this.state.user.id
+                })
+            })
+            .then(response => response.json())
+            .then(count => {
+                this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+        }
     })
+    .catch(err => console.log(err));
   }
 
   onRouteChange = (route) => {
@@ -143,7 +142,7 @@ class App extends Component {
             ? <div>
                 <Logo />
                 <Rank name={this.state.user.name} entries={this.state.user.entries}/>
-                <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
+                <ImageLinkForm onInputChange={this.onInputChange} onPictureSubmit={this.onPictureSubmit} />
                 <FaceRecognition box={box} imageUrl={imageUrl} />
               </div>
             : (
