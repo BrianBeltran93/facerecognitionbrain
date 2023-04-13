@@ -9,45 +9,20 @@ import Register from './components/Register/Register';
 import { Component } from 'react';
 import ParticlesBg from 'particles-bg';
 
-const setupClarifaiRequestOptions = (imageUrl) => {
-  // Your PAT (Personal Access Token) can be found in the portal under Authentification
-  const PAT = 'd3ba2de3e74c4b19ac4a849af65e8e4c';
-  // Specify the correct user_id/app_id pairings
-  // Since you're making inferences outside your app's scope
-  const USER_ID = 'brianb93';       
-  const APP_ID = 'my-first-application';
-  // Change these to whatever model and image URL you want to use
-  //const MODEL_ID = 'face-detection';
-  const IMAGE_URL = imageUrl;
-
-  const raw = JSON.stringify({
-    "user_app_id": {
-        "user_id": USER_ID,
-        "app_id": APP_ID
-    },
-    "inputs": [
-        {
-            "data": {
-                "image": {
-                    "url": IMAGE_URL
-                }
-            }
-        }
-    ]
-  });
-
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Key ' + PAT
-    },
-    body: raw
-  };
-
-  return requestOptions;
+const initialState = {
+  input: '',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
 }
-
 
 class App extends Component {
   constructor() {
@@ -102,7 +77,13 @@ class App extends Component {
   onPictureSubmit = () => {
     this.setState({imageUrl: this.state.input});
 
-    fetch("https://api.clarifai.com/v2/models/face-detection/outputs", setupClarifaiRequestOptions(this.state.input))
+    fetch('http://localhost:3001/imageurl', {
+      method: 'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+          input: this.state.input
+      })
+    })
     .then(response => response.json())
     .then(response => {
         this.displayFaceBox(this.calculateFaceLocation(response))
@@ -118,6 +99,7 @@ class App extends Component {
             .then(count => {
                 this.setState(Object.assign(this.state.user, { entries: count}))
             })
+            .catch(console.log)
         }
     })
     .catch(err => console.log(err));
@@ -125,11 +107,12 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if (route === 'signout') {
-        this.setState({isSignedIn: false})
+        this.setState(initialState)
     } else if (route === 'home') {
-        this.setState({isSignedIn: true})
+        this.setState({isSignedIn: true, route: route})
+    } else {
+      this.setState({route: route})
     }
-    this.setState({route: route})
   }
 
   render() {
