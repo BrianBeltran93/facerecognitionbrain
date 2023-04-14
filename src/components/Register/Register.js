@@ -6,7 +6,8 @@ class Register extends React.Component {
         this.state = {
             email: '',
             password: '',
-            name: ''
+            name: '',
+            badCredentials: false
         }
     }
 
@@ -23,6 +24,7 @@ class Register extends React.Component {
     }
 
     onSubmitRegister = () => {
+        this.setState({badCredentials: false})
         fetch('https://smartbrain-backend-bsst.onrender.com/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -38,7 +40,11 @@ class Register extends React.Component {
                     this.props.loadUser(user)
                     this.props.onRouteChange('home')
                 }
+                else {
+                    this.setState({badCredentials: true})
+                }
             })
+            .catch(console.log)
     }
 
     render() {
@@ -67,6 +73,16 @@ class Register extends React.Component {
                                 onChange={this.onPasswordChange} />
                             </div>
                         </fieldset>
+                        { this.state.badCredentials 
+                            ? <div>
+                                <p className="dark-red f4 b">
+                                    Bad Credentials! No blank spaces and email must not be currently registered!
+                                </p>
+                              </div> 
+                            :
+                              <div>
+                              </div>
+                        }
                         <div className="">
                             <input onClick={this.onSubmitRegister}
                             className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
