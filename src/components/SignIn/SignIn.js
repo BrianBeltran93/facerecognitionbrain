@@ -5,7 +5,8 @@ class SignIn extends React.Component {
         super(props);
         this.state = {
             signInEmail: '',
-            signInPassword: ''
+            signInPassword: '',
+            wrongCredentials: false
         }
     }
 
@@ -18,6 +19,7 @@ class SignIn extends React.Component {
     }
 
     onSubmitSignIn = () => {
+        this.setState({wrongCredentials: false});
         fetch('https://smartbrain-backend-bsst.onrender.com/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -32,7 +34,11 @@ class SignIn extends React.Component {
                     this.props.loadUser(user);
                     this.props.onRouteChange('home')
                 }
+                else {
+                    this.setState({wrongCredentials: true})
+                }
             })
+        .catch(console.log)
     }
 
     render() {
@@ -56,6 +62,14 @@ class SignIn extends React.Component {
                                 type="password" name="password"  id="password" />
                             </div>
                         </fieldset>
+                        { this.state.wrongCredentials 
+                            ? <div>
+                                <p className="dark-red f4 b">Wrong Credentials!</p>
+                              </div> 
+                            :
+                              <div>
+                              </div>
+                        }
                         <div className="">
                             <input onClick={this.onSubmitSignIn}
                             className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib" 
