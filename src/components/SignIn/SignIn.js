@@ -6,7 +6,8 @@ class SignIn extends React.Component {
         this.state = {
             signInEmail: '',
             signInPassword: '',
-            wrongCredentials: false
+            isWrongCredentials: false,
+            isLoading: false
         }
     }
 
@@ -19,7 +20,7 @@ class SignIn extends React.Component {
     }
 
     onSubmitSignIn = () => {
-        this.setState({wrongCredentials: false});
+        this.setState({isWrongCredentials: false, isLoading: true});
         fetch('https://smartbrain-backend-bsst.onrender.com/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -31,11 +32,12 @@ class SignIn extends React.Component {
             .then(response => response.json())
             .then(user => {
                 if (user.id) {
+                    this.setState({isLoading: false})
                     this.props.loadUser(user);
                     this.props.onRouteChange('home')
                 }
                 else {
-                    this.setState({wrongCredentials: true})
+                    this.setState({isLoading: false, isWrongCredentials: true})
                 }
             })
         .catch(console.log)
@@ -70,10 +72,15 @@ class SignIn extends React.Component {
                                 type="password" name="password"  id="password" />
                             </div>
                         </fieldset>
-                        { this.state.wrongCredentials 
+                        { this.state.isWrongCredentials 
                             ? <div>
                                 <p className="dark-red f4 b">Wrong Credentials!</p>
                               </div> 
+                            : this.state.isLoading
+                            ?
+                              <div>
+                                <p className="f4 b">Please wait...</p>
+                              </div>
                             :
                               <div>
                               </div>

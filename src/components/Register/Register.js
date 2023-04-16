@@ -7,7 +7,8 @@ class Register extends React.Component {
             email: '',
             password: '',
             name: '',
-            badCredentials: false
+            isBadCredentials: false,
+            isLoading: false,
         }
     }
 
@@ -24,7 +25,7 @@ class Register extends React.Component {
     }
 
     onSubmitRegister = () => {
-        this.setState({badCredentials: false})
+        this.setState({isBadCredentials: false, isLoading: true})
         fetch('https://smartbrain-backend-bsst.onrender.com/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
@@ -37,11 +38,12 @@ class Register extends React.Component {
             .then(response => response.json())
             .then(user => {
                 if (user.id) {
+                    this.setState({isLoading: false})
                     this.props.loadUser(user)
                     this.props.onRouteChange('home')
                 }
                 else {
-                    this.setState({badCredentials: true})
+                    this.setState({isLoading: false, isBadCredentials: true})
                 }
             })
             .catch(console.log)
@@ -82,13 +84,19 @@ class Register extends React.Component {
                                 onChange={this.onPasswordChange} />
                             </div>
                         </fieldset>
-                        { this.state.badCredentials 
-                            ? <div>
+                        { this.state.isBadCredentials 
+                            ? 
+                            <div>
                                 <p className="dark-red f4 b">
                                     Bad Credentials! No blank spaces and email must not be currently registered!
                                 </p>
-                              </div> 
-                            :
+                            </div> 
+                            : this.state.isLoading
+                            ?
+                            <div>
+                                <p className="f4 b">Please wait...</p>
+                              </div>
+                            : 
                               <div>
                               </div>
                         }
