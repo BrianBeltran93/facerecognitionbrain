@@ -26,7 +26,7 @@ class Register extends React.Component {
 
     onSubmitRegister = () => {
         this.setState({isBadCredentials: false, isLoading: true})
-        fetch('https://smartbrain-backend-bsst.onrender.com/register', {
+        fetch(process.env.REACT_APP_URL + '/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

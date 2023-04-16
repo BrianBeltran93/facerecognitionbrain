@@ -21,7 +21,7 @@ class SignIn extends React.Component {
 
     onSubmitSignIn = () => {
         this.setState({isWrongCredentials: false, isLoading: true});
-        fetch('https://smartbrain-backend-bsst.onrender.com/signin', {
+        fetch(process.env.REACT_APP_URL + '/signin', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({

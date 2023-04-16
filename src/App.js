@@ -77,7 +77,7 @@ class App extends Component {
   onPictureSubmit = () => {
     this.setState({imageUrl: this.state.input});
 
-    fetch('https://smartbrain-backend-bsst.onrender.com/imageurl', {
+    fetch(process.env.REACT_APP_URL+ '/imageurl', {
       method: 'post',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
@@ -88,7 +88,7 @@ class App extends Component {
     .then(response => {
         this.displayFaceBox(this.calculateFaceLocation(response))
         if (response) {
-            fetch('https://smartbrain-backend-bsst.onrender.com/image', {
+            fetch(process.env.REACT_APP_URL + '/image', {
                 method: 'put',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
