@@ -139,6 +139,10 @@ class App extends Component {
     }
   }
 
+  onSubmitDelete = () => {
+    console.log("caca")
+  }
+
   render() {
     const { isSignedIn, imageUrl, route, box, user } = this.state;
     return (
@@ -158,7 +162,7 @@ class App extends Component {
             <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
           : route === 'profile'
           ?
-            <Profile user={user}/>
+            <Profile user={user} onSubmitDelete={this.onSubmitDelete} />
           :
             <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange} />
         }
