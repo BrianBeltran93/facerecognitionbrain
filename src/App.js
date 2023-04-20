@@ -7,6 +7,7 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
 import Profile from './components/Profile/Profile';
+import Home from './components/Home/Home';
 import { Component } from 'react';
 import ParticlesBg from 'particles-bg';
 
@@ -160,6 +161,12 @@ class App extends Component {
         <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
         { route === 'home'
           ? 
+            <div>
+              <Logo />
+              <Home onRouteChange={this.onRouteChange} />
+            </div>
+          : route ==='facedetection'
+          ?
             <div>
             <Logo />
             <Rank name={this.state.user.name} entries={this.state.user.entries} />
