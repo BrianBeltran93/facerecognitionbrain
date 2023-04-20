@@ -24,8 +24,7 @@ const Profile = ({user, onSubmitDelete }) => {
         trigger={<button className="button f5 link grow br3 ph3 pv2 mb2 dib white bg-dark-red"
         > DELETE ACCOUNT </button>}
         modal
-        nested
-      >
+        nested>
         {close => (
           <div className="modal ba popup-bg dim-page">
             <button className="close" onClick={close}>

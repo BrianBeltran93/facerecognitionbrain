@@ -140,7 +140,16 @@ class App extends Component {
   }
 
   onSubmitDelete = () => {
-    console.log("caca")
+    fetch(process.env.REACT_APP_URL + '/deleteaccount', {
+      method: 'delete',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: this.state.user.email
+      })
+    })
+      .then(response => response.json())
+      .then(this.onRouteChange('signout'))
+    .catch(err => console.log)
   }
 
   render() {
