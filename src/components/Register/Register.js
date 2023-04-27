@@ -6,9 +6,11 @@ class Register extends React.Component {
     this.state = {
       email: '',
       password: '',
+      confirmationPassword: '',
       name: '',
       isBadCredentials: false,
       isLoading: false,
+      isBadPassword: false
     }
   }
 
@@ -24,29 +26,37 @@ class Register extends React.Component {
     this.setState({ password: event.target.value })
   }
 
+  onPasswordConfirmationChange = (event) => {
+    this.setState({ confirmationPassword: event.target.value })
+  }
+
   onSubmitRegister = () => {
-    this.setState({ isBadCredentials: false, isLoading: true })
-    fetch(process.env.REACT_APP_URL + '/register', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password,
-        name: this.state.name
+    this.setState({ isBadCredentials: false, isBadPassword: false, isLoading: true })
+    if (this.state.password !== this.state.confirmationPassword) {
+      this.setState({ isBadPassword: true, isLoading: false })
+    } else {
+      fetch(process.env.REACT_APP_URL + '/register', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: this.state.email,
+          password: this.state.password,
+          name: this.state.name
+        })
       })
-    })
-      .then(response => response.json())
-      .then(user => {
-        if (user.id) {
-          this.setState({ isLoading: false })
-          this.props.loadUser(user)
-          this.props.onRouteChange('home')
-        }
-        else {
-          this.setState({ isLoading: false, isBadCredentials: true })
-        }
-      })
-      .catch(console.log)
+        .then(response => response.json())
+        .then(user => {
+          if (user.id) {
+            this.setState({ isLoading: false })
+            this.props.loadUser(user)
+            this.props.onRouteChange('home')
+          }
+          else {
+            this.setState({ isLoading: false, isBadCredentials: true })
+          }
+        })
+        .catch(console.log)
+    }
   }
 
   handleKeyDown = (event) => {
@@ -83,20 +93,32 @@ class Register extends React.Component {
                   type="password" name="password" id="password"
                   onChange={this.onPasswordChange} />
               </div>
+              <div className="mv3">
+                <label className="db fw6 lh-copy f6" htmlFor="password">Re-enter Password</label>
+                <input onKeyDown={this.handleKeyDown}
+                  className="b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100"
+                  type="password" name="password" id="confirmationpassword"
+                  onChange={this.onPasswordConfirmationChange} />
+              </div>
             </fieldset>
             {this.state.isBadCredentials
               ?
               <div>
                 <p className="dark-red f4 b">
-                  Bad Credentials! No blank spaces and email must not be currently registered!
+                  Bad Credentials! No blanks and email must not be currently registered!
                 </p>
               </div>
               : this.state.isLoading
-                ?
+              ?
                 <div>
                   <p className="f4 b">Please wait...</p>
                 </div>
-                :
+              : this.state.isBadPassword
+              ?
+                <p className="dark-red f4 b">
+                  Passwords do not match!
+                </p>
+              :
                 <div>
                 </div>
             }
