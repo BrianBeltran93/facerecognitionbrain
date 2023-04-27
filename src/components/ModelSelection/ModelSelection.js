@@ -10,9 +10,9 @@ const ModelSelection = ({ setModelDetection }) => {
       <input type="radio" name="model-selection" value="age-recognition" 
       onClick={() => setModelDetection('age-recognition')} />
       <label className="pa2">Age Recognition</label>
-      <input type="radio" name="model-selection" value="demographics-recognition" 
-      onClick={() => setModelDetection('demographics-recognition')} />
-      <label className="pa2">Demographics Recognition</label>
+      <input type="radio" name="model-selection" value="Ethnicity-recognition" 
+      onClick={() => setModelDetection('ethnicity-recognition')} />
+      <label className="pa2">Ethnicity Recognition</label>
     </div>
   )
 } 

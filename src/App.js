@@ -9,6 +9,7 @@ import Register from './components/Register/Register';
 import Profile from './components/Profile/Profile';
 import ModelSelection from './components/ModelSelection/ModelSelection';
 import AgeRecognition from './components/AgeRecognition/AgeRecognition';
+import EthnicityRecognition from './components/EthnicityRecognition/EthnicityRecognition';
 import { Component } from 'react';
 import ParticlesBg from 'particles-bg';
 
@@ -30,10 +31,15 @@ const initialState = {
     first: ['', 0],
     second: ['', 0],
     third: ['', 0]
+  },
+  ethnicityRanges: {
+    first: ['', 0],
+    second: ['', 0],
+    third: ['', 0]
   }
 }
 
-const initialAgeRanges = {
+const initialRanges = {
   first: ['', 0],
   second: ['', 0],
   third: ['', 0]
@@ -57,6 +63,11 @@ class App extends Component {
         joined: ''
       },
       ageRanges: {
+        first: ['', 0],
+        second: ['', 0],
+        third: ['', 0]
+      },
+      ethnicityRanges: {
         first: ['', 0],
         second: ['', 0],
         third: ['', 0]
@@ -116,16 +127,17 @@ class App extends Component {
 
   onPictureSubmit = () => {
     this.setState()
-    this.setState({ imageUrl: this.state.input, box: {}, ageRanges: initialAgeRanges });
+    this.setState({ imageUrl: this.state.input, box: {}, ageRanges: initialRanges, ethnicityRanges: initialRanges });
     
     if (this.state.model === 'face-recognition') {
       this.submitFaceDetection();
     } else if (this.state.model === 'age-recognition') {
       this.submitAgeDetection();
+    } else if (this.state.model === 'ethnicity-recognition') {
+      this.submitEthnicityDetection();
     } else {
       console.log('oops!')
     }
-    
   }
 
   submitFaceDetection = () => {
@@ -168,7 +180,7 @@ class App extends Component {
     })
       .then(response => response.json())
       .then(response => {
-        this.setAgeRangeData(response)
+        this.setRangeData(response)
         if (response) {
           fetch(process.env.REACT_APP_URL + '/image', {
             method: 'put',
@@ -188,13 +200,49 @@ class App extends Component {
       .catch(err => console.log(err));
   }
 
-  setAgeRangeData = (response) => {
-  const newAgeRanges = {
+  submitEthnicityDetection = () => {
+    fetch(process.env.REACT_APP_URL + '/ethnicitydetection', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: this.state.input
+      })
+    })
+      .then(response => response.json())
+      .then(response => {
+        this.setRangeData(response)
+        if (response) {
+          fetch(process.env.REACT_APP_URL + '/image', {
+            method: 'put',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: this.state.user.id
+            })
+          })
+            .then(response => response.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count }))
+              localStorage.setItem('user', JSON.stringify(this.state.user))
+            })
+            .catch(console.log)
+        }
+      })
+      .catch(err => console.log(err));
+  }
+
+  setRangeData = (response) => {
+  const newRanges = {
     first: [response.outputs[0].data.concepts[0].name, response.outputs[0].data.concepts[0].value],
     second: [response.outputs[0].data.concepts[1].name, response.outputs[0].data.concepts[1].value],
     third: [response.outputs[0].data.concepts[2].name, response.outputs[0].data.concepts[2].value]
   }
-  this.setState({ageRanges: newAgeRanges })
+  if (this.state.model === 'age-recognition') {
+    this.setState({ageRanges: newRanges })
+  } else if (this.state.model === 'ethnicity-recognition') {
+    this.setState({ethnicityRanges: newRanges})
+  } else {
+    console.log("oops!")
+  }
 }
 
   onRouteChange = (route) => {
@@ -228,7 +276,7 @@ class App extends Component {
   }
 
   render() {
-    const { isSignedIn, imageUrl, route, box, user, model, ageRanges } = this.state;
+    const { isSignedIn, imageUrl, route, box, user, model, ageRanges, ethnicityRanges } = this.state;
     return (
       <div className="App">
         <ParticlesBg className="particles" color="#ffffff" num={200} type="cobweb" bg={true} />
@@ -243,8 +291,14 @@ class App extends Component {
             {model === 'face-recognition'
             ?
               <FaceRecognition box={box} imageUrl={imageUrl} />
-            : 
+            : model === 'age-recognition'
+            ?
               <AgeRecognition ageRanges={ageRanges} imageUrl={imageUrl} />
+            : model === 'ethnicity-recognition'
+            ?
+              <EthnicityRecognition ethnicityRanges={ethnicityRanges} imageUrl={imageUrl} />
+            :
+              <div></div>
             }
             </div>
           : route === 'signin'
